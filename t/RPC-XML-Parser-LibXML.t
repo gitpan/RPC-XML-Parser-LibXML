@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 24;
+use Test::More tests => 28;
 BEGIN { use_ok('RPC::XML::Parser::LibXML') };
 
 use RPC::XML;
@@ -375,7 +375,8 @@ _is_deeply parse_rpc_xml(qq{<?xml version="1.0" encoding="utf-8"?>
   ),
   'Windows Live Write style newlines';
 
-my $r = eval { RPC::XML::Parser::LibXML::parse_rpc_xml(<<XML);
+{
+    my $r = eval { RPC::XML::Parser::LibXML::parse_rpc_xml(<<XML);
 <?xml version="1.0" encoding="UTF-8"?>
 <methodCall>
 <methodName>metaWeblog.newPost</methodName><params>
@@ -385,10 +386,53 @@ my $r = eval { RPC::XML::Parser::LibXML::parse_rpc_xml(<<XML);
 <param><value><boolean>1</boolean></value></param></params>
 </methodCall>
 XML
-};
+    };
 
-ok !$@;
-is $r->{name}, 'metaWeblog.newPost';
-is @{ $r->{args} }, 5;
+    ok !$@;
+    is $r->{name}, 'metaWeblog.newPost';
+    is @{ $r->{args} }, 5;
+}
 
+{
+    my $r = eval { RPC::XML::Parser::LibXML::parse_rpc_xml(<<XML);
+<?xml version="1.0" encoding="UTF-8"?>
+<methodCall>
+ <methodName>metaWeblog.newPost</methodName>
+ <params>
+  <param>
+   <value>foobar</value>
+  </param>
+  <param>
+   <value><string>**ACCOUNTNAME**</string></value>
+  </param>
+  <param>
+   <value><string>**PASSWORD**</string></value>
+  </param>
+  <param>
+   <value>
+    <struct>
+     <member><name>title</name><value>test</value></member>
+     <member><name>description</name><value><string>desc</string></value></member>
+    </struct>
+   </value>
+  </param>
+  <param>
+   <value>
+    <array>
+     <data>
+      <value>foo</value>
+      <value><string>bar</string></value>
+     </data>
+    </array>
+   </value>
+  </param>
+ </params>
+</methodCall>
+XML
+    };
 
+    is $r->{args}->[0]->value, 'foobar';
+    is $r->{args}->[3]->{title}->value, 'test';
+    is $r->{args}->[3]->{description}->value, 'desc';
+    is_deeply $r->{args}->[4], [ map RPC::XML::string->new($_), qw( foo bar ) ];
+}
