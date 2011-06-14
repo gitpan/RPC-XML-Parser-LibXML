@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: 'Module::Install version 1.00'
+generated_by: 'Module::Install version 1.01'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,9 +24,9 @@ requires:
   Encode: 0
   MIME::Base64: 0
   RPC::XML: 0.73
-  XML::LibXML: 0
+  XML::LibXML: 1.7
   perl: 5.8.0
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tokuhirom/p5-RPC-XML-Parser-LibXML.git
-version: 0.05
+version: 0.06
